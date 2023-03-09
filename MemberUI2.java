@@ -57,8 +57,8 @@ public class MemberUI2 {
 				MemberVO bag = new MemberVO(); 
 				// 2. 가방에 값들을 넣기
 				bag.setId(id);
-				bag.setName(name);
 				bag.setpw(pw);
+				bag.setName(name);
 				bag.setTel(tel);
 				// 3. 값들이 들어있는 가방을 전달하자
 				int result = dao.insert(bag); // 1 or 0
@@ -115,12 +115,22 @@ public class MemberUI2 {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("회원검색 처리");
 				String id = text1.getText();
-				String pw = text2.getText();
-				String name = text3.getText();
-				String tel = text4.getText();
-
 				MemberDAO3 dao = new MemberDAO3();
-				
+				MemberVO bag = dao.select(id);
+				if (bag != null) {
+					text2.setText(bag.getpw());
+					text3.setText(bag.getName());
+					text4.setText(bag.getTel());
+					text2.setBackground(Color.pink);
+					text3.setBackground(Color.pink);
+					text4.setBackground(Color.pink);
+				}else {
+					text2.setText("");
+					text3.setText("");
+					text4.setText("");
+					JOptionPane.showMessageDialog(f, "검색결과 없음");
+				}
+			
 				
 			}
 		});
