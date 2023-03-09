@@ -1,17 +1,14 @@
 package 자바DB연결;
 
-import java.awt.Component;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import javax.swing.JOptionPane;
+import 화면DB연결.ShareVO;
 
-import 화면DB연결.MemberVO;
 
-public class MemberDAO3 {
-	
+public class ShareDAO {
 	public MemberVO select(String id) {
 		ResultSet rs = null; ////항목명 + 결과 데이터를 담고 있는 테이블
 		////기본형 : 정수/실수/문자/논리만 값으로 초기화
@@ -78,30 +75,25 @@ public class MemberDAO3 {
 		////검색결과가 없으면 null이 들어가 있음
 		}
 	
-	public int delete(String id) {
+	public int delete(int no) {
 		int result = 0;
 		try {
-			// 1. 오라클 11g와 연결한 부품 설정(커넥터 설정)
+			
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			System.out.println("1.오라클과 자바 연결할 부품 설정 성공");
 			
-			// 2. 오라클 11g에 연결하자(java ---- oracle)(DB연결)
+			
 			String url = "jdbc:oracle:thin:@localhost:1521:xe";
 			String user = "system";
 			String password = "oracle";
 			Connection con = DriverManager.getConnection(url, user, password);
 			System.out.println("2.오라클 연결 성공");
 			
-			// 3. SQL문을 만든다.
-			// URL u = new URL(url);
-			// 자바는 부품조립식이여서, String에 넣은 문자열을 특정한 부품으로 인식하지 못 함
-			// 특정한 부품으로 인식하려면 그 부품으로 만들어주어야 한다
-			//SQL부품으로 만들어주어야 함 >> PreparedStatement 가 SQL부품!!
-			String sql = "delete from hr.MEMBER where id = ? ";
+			
+			String sql = "delete from hr.Share_BBS where no = ? ";
 			PreparedStatement ps = con.prepareStatement(sql); 
 			
-			//con부품으로 sql스트링에 있는 것 SQL부품으로 만들어주세요
-			ps.setString(1, id);
+			ps.setInt(1, no);
 			
 			System.out.println("3.SQL문 부품(객체)으로 만들어주기");
 			
@@ -109,7 +101,7 @@ public class MemberDAO3 {
 			result = ps.executeUpdate();
 			System.out.println("4.SQL문 오라클로 보내기 성공");
 			if (result >= 1) {
-				System.out.println("탈퇴 성공");
+				System.out.println("삭제완료");
 			}
 			
 		} catch (Exception e) {
@@ -118,39 +110,36 @@ public class MemberDAO3 {
 		return result;
 	}
 	
-	public int update(MemberVO bag) {
+	public int update(ShareVO bag) {
 		int result = 0;
 		try {
-			// 1. 오라클 11g와 연결한 부품 설정(커넥터 설정)
+			
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			System.out.println("1.오라클과 자바 연결할 부품 설정 성공");
 			
-			// 2. 오라클 11g에 연결하자(java ---- oracle)(DB연결)
+			
 			String url = "jdbc:oracle:thin:@localhost:1521:xe";
 			String user = "system";
 			String password = "oracle";
 			Connection con = DriverManager.getConnection(url, user, password);
 			System.out.println("2.오라클 연결 성공");
 			
-			// 3. SQL문을 만든다.
-			// URL u = new URL(url);
-			// 자바는 부품조립식이여서, String에 넣은 문자열을 특정한 부품으로 인식하지 못 함
-			// 특정한 부품으로 인식하려면 그 부품으로 만들어주어야 한다
-			//SQL부품으로 만들어주어야 함 >> PreparedStatement 가 SQL부품!!
-			String sql = "update hr.MEMBER set tel = ? where id = ? ";
-			PreparedStatement ps = con.prepareStatement(sql); 
-			//con부품으로 sql스트링에 있는 것 SQL부품으로 만들어주세요
-			ps.setString(1, bag.getTel()); // 그냥 먼저 적혀있는 순서대로..
-			ps.setString(2, bag.getId());
 			
+			String sql = "update hr.SHARE_BBS set title = ?, book = ? where no = ? and id = ?";
+			PreparedStatement ps = con.prepareStatement(sql); 
+			
+			ps.setString(1, bag.getTitle());
+			ps.setInt(2, bag.getBook());
+			ps.setInt(3, bag.getNo());
+			ps.setString(4, bag.getId());
 			
 			System.out.println("3.SQL문 부품(객체)으로 만들어주기");
 			
 			// 4. 전송
-			result = ps.executeUpdate(); //insert, update, delete문만!! sql문 실행결과가 int
+			result = ps.executeUpdate(); 
 			System.out.println("4.SQL문 오라클로 보내기 성공");
 			if (result >= 1) {
-				System.out.println("업데이트 성공");
+				System.out.println("게시글 수정 성공");
 			}
 			
 		} catch (Exception e) {
@@ -159,41 +148,37 @@ public class MemberDAO3 {
 		return result;
 	}
 	
-	public int insert(MemberVO bag) {
+	public int insert(ShareVO bag) {
 		int result = 0;
 		try {
-			// 1. 오라클 11g와 연결한 부품 설정(커넥터 설정)
+			
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			System.out.println("1.오라클과 자바 연결할 부품 설정 성공");
 			
-			// 2. 오라클 11g에 연결하자(java ---- oracle)(DB연결)
+			
 			String url = "jdbc:oracle:thin:@localhost:1521:xe";
 			String user = "system";
 			String password = "oracle";
 			Connection con = DriverManager.getConnection(url, user, password);
 			System.out.println("2.오라클 연결 성공");
 			
-			// 3. SQL문을 만든다.
-			// URL u = new URL(url);
-			// 자바는 부품조립식이여서, String에 넣은 문자열을 특정한 부품으로 인식하지 못 함
-			// 특정한 부품으로 인식하려면 그 부품으로 만들어주어야 한다
-			//SQL부품으로 만들어주어야 함 >> PreparedStatement 가 SQL부품!!
-			String sql = "insert into hr.MEMBER values (?, ?, ?, ?)";
+			
+			String sql = "insert into hr.SHARE_BBS values (?, ?, ?, ?)";
 			PreparedStatement ps = con.prepareStatement(sql); 
-			//con부품으로 sql스트링에 있는 것 SQL부품으로 만들어주세요
-			ps.setString(1, bag.getId()); // 그냥 먼저 적혀있는 순서대로..
-			ps.setString(2, bag.getpw());
-			ps.setString(3, bag.getName());			
-			ps.setString(4, bag.getTel());
+			
+			ps.setInt(1, bag.getNo()); 
+			ps.setString(2, bag.getId());
+			ps.setString(3, bag.getTitle());		
+			ps.setInt(4, bag.getBook());
 			
 			
 			System.out.println("3.SQL문 부품(객체)으로 만들어주기");
 			
-			// 4. 전송
-			result = ps.executeUpdate(); //insert, update, delete문만!! sql문 실행결과가 int
+		
+			result = ps.executeUpdate(); 
 			System.out.println("4.SQL문 오라클로 보내기 성공");
 			if (result == 1) {
-				System.out.println("회원가입 성공");
+				System.out.println("게시판 작성 성공");
 			}
 			
 		} catch (Exception e) {
@@ -203,56 +188,4 @@ public class MemberDAO3 {
 		return result;
 	}
 	
-	
-	
-	/////////////로그인
-
-	public int login (MemberVO bag) {
-		int result = 0;
-		
-		try {
-			// 1. 오라클 11g와 연결한 부품 설정(커넥터 설정)
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-			System.out.println("1.오라클과 자바 연결할 부품 설정 성공");
-			
-			// 2. 오라클 11g에 연결하자(java ---- oracle)(DB연결)
-			String url = "jdbc:oracle:thin:@localhost:1521:xe";
-			String user = "system";
-			String password = "oracle";
-			Connection con = DriverManager.getConnection(url, user, password);
-			System.out.println("2.오라클 연결 성공");
-			
-			// 3. SQL문을 만든다.
-			// URL u = new URL(url);
-			// 자바는 부품조립식이여서, String에 넣은 문자열을 특정한 부품으로 인식하지 못 함
-			// 특정한 부품으로 인식하려면 그 부품으로 만들어주어야 한다
-			//SQL부품으로 만들어주어야 함 >> PreparedStatement 가 SQL부품!!
-			String sql = "select * from hr.MEMBER where id = ? and where pw = ? ";
-			PreparedStatement ps = con.prepareStatement(sql); 
-			
-			//con부품으로 sql스트링에 있는 것 SQL부품으로 만들어주세요
-			ps.setString(1, bag.getId());
-			ps.setString(2, bag.getpw());
-			
-			System.out.println("3.SQL문 부품(객체)으로 만들어주기");
-			
-			// 4. 전송
-			ResultSet rs = ps.executeQuery(); 
-			
-			System.out.println("4.SQL문 오라클로 보내기 성공");
-			if (rs.next()) { ////검색결과가 있는지 여부는 rs.next()
-				//// true이면 있다, false이면 없다 라는 의미
-				System.out.println("결과 값 있음");
-				result = 1;
-			}
-			ps.close(); con.close(); rs.close();
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return result; 
-	}
 }
-
-	
-
