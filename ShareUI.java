@@ -1,5 +1,6 @@
 package 화면DB연결;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -23,6 +24,7 @@ import 자바DB연결.ShareDAO;
 
 public class ShareUI {
 	
+
 	public static void main(String[] args) {
 		JFrame f = new JFrame();
 		f.setTitle("게시판");
@@ -54,13 +56,6 @@ public class ShareUI {
 		
 		JTable table = new JTable(all, header);
 		JScrollPane scroll = new JScrollPane(table);
-		table.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				JOptionPane.showConfirmDialog(table, "삭제하시겠습니까?");
-			}
-			
-			
-		});
 		
 		JLabel label2 = new JLabel("게시판넘버");
 		JLabel label3 = new JLabel("아이디");
@@ -73,10 +68,29 @@ public class ShareUI {
 		JTextField text3 = new JTextField(5);
 		JTextField text4 = new JTextField(5);
 		
-		JButton b1 = new JButton("게시물 작성");
-		JButton b2 = new JButton("게시물 수정");
-		JButton b3 = new JButton("게시물 삭제");
-		JButton b4 = new JButton("게시물 검색");
+		JButton b1 = new JButton("작성");
+		JButton b2 = new JButton("수정");
+		JButton b3 = new JButton("삭제");
+		JButton b4 = new JButton("검색");
+		
+		table.addMouseListener(new MouseAdapter() {
+			
+			public void mouseClicked(MouseEvent e) {
+				
+				int rowNo = table.getSelectedRow();
+			
+				Object no = table.getModel().getValueAt(rowNo, 0);
+				Object id = table.getModel().getValueAt(rowNo, 1);
+				Object title = table.getModel().getValueAt(rowNo, 2);
+				Object book = table.getModel().getValueAt(rowNo, 3);
+				
+				JOptionPane.showMessageDialog(table, no + " " + id + " " + title + " " + book);
+				
+			}
+
+			
+		});
+		
 		
 		b1.addActionListener(new ActionListener() {
 
@@ -90,14 +104,12 @@ public class ShareUI {
 				String title = text3.getText();
 				String book = text4.getText();
 				
-				
-				if (id.equals("")) { //기본형 4가지만 ==로 값 비교 가능
+				if (id.equals("")) { 
 					JOptionPane.showMessageDialog(f, "id는 필수입력 항목입니다");
 					
 				} else {
 					
 				ShareDAO dao = new ShareDAO();
-				
 				ShareVO bag = new ShareVO(); 
 				bag.setNo(no2);
 				bag.setId(id);
@@ -106,15 +118,19 @@ public class ShareUI {
 				
 				int result = dao.insert(bag); // 1 or 0
 				if (result == 1) {
-					JOptionPane.showMessageDialog(f, "게시판 글 작성완료"); //1
+					JOptionPane.showMessageDialog(f, "게시판 작성완료");
+					text1.setText(" ");
+					text2.setText(" ");
+					text3.setText(" ");
+					text4.setText(" ");
+					
 					
 				}else {
-					JOptionPane.showMessageDialog(f, "게시판 글 작성 실패, 아이디 혹은 북넘버를 확인 해주세요"); //0
+					JOptionPane.showMessageDialog(f, "게시판 작성 실패, 아이디 혹은 북넘버를 확인 해주세요"); 
 				}
 				}
 			}
 		
-				
 		
 		});
 		b2.addActionListener(new ActionListener() {
@@ -129,7 +145,6 @@ public class ShareUI {
 				String title = text3.getText();
 				String book = text4.getText();
 			
-			
 				ShareDAO dao = new ShareDAO();
 				ShareVO bag = new ShareVO();
 				bag.setTitle(title);
@@ -140,6 +155,11 @@ public class ShareUI {
 				int result = dao.update(bag);
 				if (result >= 1) {
 					JOptionPane.showMessageDialog(f, "수정완료");
+					text1.setText(" ");
+					text2.setText(" ");
+					text3.setText(" ");
+					text4.setText(" ");
+					
 				}else {
 					JOptionPane.showMessageDialog(f, "수정실패. 북넘버를 확인해주세요");
 				}
@@ -158,9 +178,14 @@ public class ShareUI {
 				
 				int result = dao.delete(no2);
 				if (result >= 1) {
-					JOptionPane.showMessageDialog(f, "수정완료");
+					JOptionPane.showMessageDialog(f, "삭제완료");
+					text1.setText(" ");
+					text2.setText(" ");
+					text3.setText(" ");
+					text4.setText(" ");
+				
 				}else {
-					JOptionPane.showMessageDialog(f, "수정 실패, 게시글 번호를 다시 확인해주세요");
+					JOptionPane.showMessageDialog(f, "삭제 실패, 게시글 번호를 다시 확인해주세요");
 				}
 
 			}
@@ -173,28 +198,26 @@ public class ShareUI {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("게시물 검색");
 				
-				String id = text1.getText();
+				String id = text2.getText();
 				
 				ShareDAO dao = new ShareDAO();
-				ArrayList<ShareVO> list = dao.list();
+				ArrayList<ShareVO> list2 = dao.list2(id);
 				
+				String[] header = {"게시판넘버", "아이디", "책 제목", "북 넘버"};
+				Object[][] all = new Object[list2.size()][4]; //섞여있음 object사용
 				
-				if () {
-				
-					ShareUI_검색.open();
+				if (list2.size() == 0) {
+					System.out.println("검색결과 없음");
 				}else {
+					ShareUI_검색.open(id);
+					System.out.println("검색결과는 전체 "+ list2.size() + "개");
 				
-					JOptionPane.showMessageDialog(f, "검색결과 없음");
+					
 				}
-				
 			}
-
-			
 		
 		});
-		
-		
-			
+	
 		FlowLayout flow = new FlowLayout();
 		
 		Font font = new Font("굴림", Font.BOLD, 40);
@@ -203,14 +226,17 @@ public class ShareUI {
 		
 		f.setLayout(flow);
 		f.add(label1);
-		f.add(label6); f.add(b4);
+		f.add(label6); 
 		f.add(scroll); 
+		
 		f.add(label2); f.add(text1);
 		f.add(label3); f.add(text2);
 		f.add(label4); f.add(text3);
-		f.add(label5); f.add(text4);
+		f.add(label5); f.add(text4); 
+	
 		f.add(b1); f.add(b2);
-		f.add(b3); 
+		f.add(b3); f.add(b4);
+		
 		label1.setFont(font);
 		label6.setFont(font);
 		label2.setFont(font3);
@@ -242,4 +268,7 @@ public class ShareUI {
 
 	}
 
-}
+	
+	}
+
+
